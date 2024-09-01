@@ -77,7 +77,7 @@ class tecnologías:
         self.tecnología = tecnología
         self.precio = precio
         self.marca = marca
-tecnología1 = tecnologías("Smart_tv_40", 700000000, "Samsung")
+tecnología1 = tecnologías("Smart tv 40", 3000000, "Samsung")
 tecnología2 = tecnologías("Celular", 2200000, "Samsung Galaxy A54")
 tecnología3 = tecnologías("Computador",2000000 , "Lenovo Ideapad 3")
 tecnología4 = tecnologías("Audifonos", 1300000, "Sony WH-1000XM4")
@@ -87,13 +87,13 @@ class dia:
     def __init__(self, dia, descuentos):
         self.dia = dia
         self.descuentos = descuentos
-d1 = dia("Lunes", 0.15)
-d2 = dia("Martes", 0.20)
-d3 = dia("Miercoles", 0.15)
-d4 = dia("Jueves", 0.15)
-d5 = dia("Viernes", 0.20)
-d6 = dia("Sabado", 0.25)
-d7 = dia("Domingo", 0.30)   
+d1 = dia("Lunes", {"Verduras":0.15})
+d2 = dia("Martes", {"Carnes":0.20})
+d3 = dia("Miercoles", {"Aseo":0.15})
+d4 = dia("Jueves", {"Carnes_frias":0.15})
+d5 = dia("Viernes", {"panaderias":0.20})
+d6 = dia("Sabado", {"lacteos":0.25})
+d7 = dia("Domingo", {"tecnología":0.30})   
 raiz = Tk()
 raiz.title("Ventas")
 raiz.minsize(width=300, height=400)
