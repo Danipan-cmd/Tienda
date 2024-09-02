@@ -1,6 +1,7 @@
 from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END, Frame, messagebox, font
 from tkinter import ttk
-
+import datetime
+import os
 # Definición de clases
 class Verduras:
     def __init__(self, verdura, precio_por_kilo): 
@@ -145,6 +146,7 @@ def agregar_producto():
     # Calcular el precio total
     precio_total = 0
     kilos = 0
+    descuento_aplicado = 0
     productos = categorias[categoria_seleccionada]
     for p in productos:
         if (categoria_seleccionada == "Verduras" and p.verdura == producto_seleccionado) or \
@@ -158,7 +160,7 @@ def agregar_producto():
             else:
                 precio_total = p.precio * cantidad_seleccionada
             descuento = descuentos_dia.get(categoria_seleccionada, 0)
-            precio_total -= precio_total * descuento
+            precio_total -= precio_total * descuento_aplicado
             break
 
     # Guardar producto agregado
@@ -184,32 +186,39 @@ def reiniciar():
     total_label.config(text="Total: $0.00")
     cantidad.set("")
     producto.set("")
+
 def generar_factura():
-    if not productos_agregados:
-        messagebox.showinfo("Factura Vacía", "No hay productos agregados para generar una factura.")
-        return
+    fecha_hora = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    nombre_archivo = f"Factura_{fecha_hora}.txt"
 
-    # Crear el contenido de la factura
-    factura = "Factura de Compra\n"
-    factura += "-----------------------------\n"
-    factura += f"Día: {Desp.get()}\n\n"
-    
-    total = 0
-    for producto, cantidad, precio, kilos in productos_agregados:
-        if kilos > 0:
-            factura += f"{producto} - {kilos} kg: ${precio:.2f}\n"
-        else:
-            factura += f"{producto} - {cantidad} unidades: ${precio:.2f}\n"
-        total += precio
+    with open(nombre_archivo, 'w') as archivo:
+        archivo.write(f"Factura\n")
+        archivo.write(f"Fecha: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        archivo.write(f"\n{'-'*50}\n")
+        archivo.write(f"{'Producto':<25} {'Cantidad':<10} {'Precio Unitario':<20} {'Descuento':<10} {'Total':<10}\n")
+        archivo.write(f"{'-'*50}\n")
 
-    factura += "-----------------------------\n"
-    factura += f"Total: ${total:.2f}\n"
+        total = 0
+        for producto, cantidad, precio, kilos, descuento in productos_agregados:
+            if descuento > 0:
+                descuento_str = f"{descuento*100:.0f}%"
+                precio_original = precio / (1 - descuento)
+            else:
+                descuento_str = "0%"
+                precio_original = precio
 
-    # Guardar la factura en un archivo de texto
-    with open("factura.txt", "w") as archivo:
-        archivo.write(factura)
+            if kilos > 0:
+                archivo.write(f"{producto:<25} {kilos:<10} {precio_original / kilos:<20.2f} {descuento_str:<10} {precio:.2f}\n")
+            else:
+                archivo.write(f"{producto:<25} {cantidad:<10} {precio_original / cantidad:<20.2f} {descuento_str:<10} {precio:.2f}\n")
+                
+            total += precio
 
-    messagebox.showinfo("Factura Generada", "La factura ha sido generada y guardada como 'factura.txt'.")
+        archivo.write(f"\n{'-'*50}\n")
+        archivo.write(f"{'Total':<25} {'':<10} {'':<20} {'':<10} {total:.2f}\n")
+
+    messagebox.showinfo("Factura Generada", f"La factura ha sido generada como {nombre_archivo}")
+
 
 # Configuración de la interfaz gráfica
 raiz = Tk()
@@ -267,5 +276,4 @@ lista_productos.pack(pady=10)
 total_label = Label(frame_derecho, text="Total: $0.00", font=("Arial", 14, "bold"), bg="#ffffff")
 total_label.pack(pady=10)
 Button(frame_izquierdo, text="Generar Factura", command=generar_factura).grid(column=0, row=6, columnspan=2, pady=10)
-
 raiz.mainloop()
