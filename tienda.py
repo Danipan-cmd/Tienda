@@ -183,7 +183,7 @@ def actualizar_productos(*args):
 
 def agregar_producto():
     dia_seleccionado = Desp.get()
-    festivo_seleccionado = Desp.get()
+    festivo_seleccionado = DespFestivo.get()  # Asegúrate de usar la variable correcta para el festivo
     categoria_seleccionada = categoria.get()
     producto_seleccionado = producto.get()
     
@@ -195,21 +195,25 @@ def agregar_producto():
         messagebox.showerror("Error", f"Cantidad inválida: {e}")
         return
 
-    # Buscar el día seleccionado
+    # Buscar el descuento del día de la semana
     descuentos_categoria = {}
-    descuentos_marca = {}
     for d in dias:
         if d.dia == dia_seleccionado:
             descuentos_categoria = d.descuentos_categoria
             break
+    
+    # Buscar el descuento del día festivo
+    descuentos_marca = {}
     for f in festivos:
-        if f.festivo== festivo_seleccionado:
-            descuentos_marca = d.descuentos_marca
+        if f.festivo == int(festivo_seleccionado):  # Convertir a entero para comparar
+            descuentos_marca = f.descuentos_marca
             break
+
     # Calcular el precio total y descuento aplicado
     precio_total = 0
     kilos = 0
-    descuento_aplicado = 0
+    descuento_aplicado_categoria = 0
+    descuento_aplicado_marca = 0
     productos = categorias[categoria_seleccionada]
     for p in productos:
         if (categoria_seleccionada == "Verduras" and p.verdura == producto_seleccionado) or \
@@ -227,15 +231,13 @@ def agregar_producto():
                 precio_total = p.precio * cantidad_seleccionada
 
             # Aplicar descuento por categoría
-            descuento_categoria = descuentos_categoria.get(categoria_seleccionada, 0)
-            descuento_aplicado = precio_total * descuento_categoria
-            precio_total -= descuento_aplicado
+            descuento_aplicado_categoria = precio_total * descuentos_categoria.get(categoria_seleccionada, 0)
+            precio_total -= descuento_aplicado_categoria
 
             # Aplicar descuento adicional por marca si el producto tiene atributo marca
             if hasattr(p, 'marca'):
-                descuento_marca_adicional = descuentos_marca.get(p.marca, 0)
-                descuento_aplicado += precio_total * descuento_marca_adicional
-                precio_total -= precio_total * descuento_marca_adicional
+                descuento_aplicado_marca = precio_total * descuentos_marca.get(p.marca, 0)
+                precio_total -= descuento_aplicado_marca
 
             break
 
@@ -245,20 +247,15 @@ def agregar_producto():
             # Actualizar la cantidad y el precio total
             nueva_cantidad = cant + cantidad_seleccionada
             nuevo_precio_total = (precio / cant) * nueva_cantidad
-            descuento_total = desc + descuento_aplicado
+            descuento_total = desc + descuento_aplicado_categoria + descuento_aplicado_marca
 
             productos_agregados[i] = (prod, nueva_cantidad, nuevo_precio_total, kg + kilos, descuento_total)
             actualizar_lista()
             return
 
     # Guardar producto agregado con descuento si no estaba antes
-    productos_agregados.append((producto_seleccionado, cantidad_seleccionada, precio_total, kilos, descuento_aplicado))
+    productos_agregados.append((producto_seleccionado, cantidad_seleccionada, precio_total, kilos, descuento_aplicado_categoria + descuento_aplicado_marca))
     actualizar_lista()
-
-
-
-
-
 
 
 def validar_entrada(texto):
@@ -335,24 +332,24 @@ def abrir_ventana_seleccion():
 def generar_factura():
     fecha = datetime.datetime.now().strftime("%d/%m/%Y")
     factura = f"Factura - {fecha}\n"
-    factura += "-" * 50 + "\n"
-    factura += f"{'Producto':<20} {'Cantidad':<10} {'Precio Unitario':<15} {'Descuento':<15} {'Total':<15}\n"
-    factura += "-" * 50 + "\n"
+    factura += "-" * 80 + "\n"  # Ampliar la línea divisoria para ajustarse al nuevo ancho
+    factura += f"{'Producto':<35} {'Cantidad':<10} {'Precio Unitario':<15} {'Descuento':<15} {'Total':<15}\n"
+    factura += "-" * 80 + "\n"
     
     total = 0
     for producto, cantidad, precio, kilos, descuento in productos_agregados:
         if kilos > 0:
             precio_unitario = precio / kilos
             descuento_str = f"${descuento:.2f}" if descuento > 0 else "N/A"
-            factura += f"{producto:<20} {kilos:<10} {precio_unitario:<15.2f} {descuento_str:<15} ${precio:.2f}\n"
+            factura += f"{producto:<35} {kilos:<10} {precio_unitario:<15.2f} {descuento_str:<15} ${precio:.2f}\n"
         else:
             precio_unitario = precio / cantidad
             descuento_str = f"${descuento:.2f}" if descuento > 0 else "N/A"
-            factura += f"{producto:<20} {cantidad:<10} {precio_unitario:<15.2f} {descuento_str:<15} ${precio:.2f}\n"
+            factura += f"{producto:<35} {cantidad:<10} {precio_unitario:<15.2f} {descuento_str:<15} ${precio:.2f}\n"
         total += precio
 
-    factura += "-" * 50 + "\n"
-    factura += f"{'Total':<45} ${total:.2f}\n"
+    factura += "-" * 80 + "\n"
+    factura += f"{'Total':<60} ${total:.2f}\n"
 
     # Guardar la factura en un archivo con nombre único basado en fecha y hora
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
@@ -367,6 +364,7 @@ def generar_factura():
 
 def reiniciar():
     Desp.set("")
+    DespFestivo.set("")
     categoria.set("")
     producto.set("")
     cantidad.set("")
@@ -378,6 +376,8 @@ raiz = Tk()
 raiz.title("Caja Registradora")
 raiz.geometry("800x600")
 raiz.configure(background="#f7f7f7")
+
+raiz.state('zoomed')
 
 # Crear contenedor principal
 frame_principal = Frame(raiz, bg="#f7f7f7")
@@ -398,6 +398,7 @@ Desp = StringVar(raiz)
 Desp.set("")
 opciones = [d.dia for d in dias]
 OptionMenu(frame_izquierdo, Desp, *opciones).grid(column=1, row=0, pady=10)
+
 Label(frame_izquierdo, text="Día festivo", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=1, pady=10)
 DespFestivo = StringVar(raiz)
 DespFestivo.set("")  
@@ -424,22 +425,19 @@ Entry(frame_izquierdo, textvariable=entrada, validate="key", validatecommand=(va
 Entry(frame_izquierdo, textvariable=cantidad, width=10).grid(column=1, row=4, pady=5)
 
 Button(frame_izquierdo, text="Agregar Producto", command=agregar_producto).grid(column=0, row=5, columnspan=2, pady=10)
-
-# Botón de eliminar
 Button(frame_izquierdo, text="Eliminar", command=abrir_ventana_eliminar).grid(column=0, row=6, columnspan=2, pady=10)
+Button(frame_izquierdo, text="Generar Factura", command=generar_factura).grid(column=0, row=7, columnspan=2, pady=10)
 
 # Contenedor derecho para la lista de productos agregados y total
 frame_derecho = Frame(frame_principal, bg="#ffffff", relief="solid", borderwidth=2)
 frame_derecho.pack(side="right", fill="both", expand=True, padx=20, pady=20)
 
 Label(frame_derecho, text="Productos Agregados", font=("Arial", 14, "bold"), bg="#ffffff").pack(pady=10)
-lista_productos = Listbox(frame_derecho, width=60, height=15, font=("Arial", 12), bg="#f0f0f0", selectmode="single")
-lista_productos.pack(pady=10)
+lista_productos = Listbox(frame_derecho, font=("Arial", 12), bg="#f0f0f0", selectmode="single")
+lista_productos.pack(fill="both", expand=True, pady=10)
 
 total_label = Label(frame_derecho, text="Total: $0.00", font=("Arial", 14, "bold"), bg="#ffffff")
 total_label.pack(pady=10)
-
-Button(frame_izquierdo, text="Generar Factura", command=generar_factura).grid(column=0, row=6, columnspan=2, pady=10)
 
 raiz.mainloop()
 
