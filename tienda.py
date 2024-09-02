@@ -1,7 +1,6 @@
-from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END, Frame, messagebox, font
-from tkinter import ttk
+from tkinter import Tk, StringVar, Frame, Label, OptionMenu, Entry, Button, Listbox, END, messagebox, Toplevel, Checkbutton, IntVar, ttk
 import datetime
-import os
+
 # Definición de clases
 class Verduras:
     def __init__(self, verdura, precio_por_kilo): 
@@ -26,16 +25,23 @@ class CarnesFrias:
         self.marca = marca
 
 class Panaderias: 
-    def __init__(self, panaderia, precio):
+    def __init__(self, panaderia, precio,marca):
         self.panaderia = panaderia
         self.precio = precio
+        self.marca=marca
+        
+class Lacteos: 
+    def __init__(self, lacteo, precio, marca):
+        self.lacteo = lacteo
+        self.precio = precio
+        self.marca = marca
         
 class Tecnologias: 
-    def __init__(self, tecnología, precio, marca,tipo):
+    def __init__(self, tecnología, precio, marca, tipo):
         self.tecnología = tecnología
         self.precio = precio
         self.marca = marca
-        self.tipo=tipo
+        self.tipo = tipo
 
 # Listas de productos
 verduras = [
@@ -57,54 +63,69 @@ carnes = [
 ]
 
 aseos = [
-    Aseos("Detergente", 26000, "FAB"),
-    Aseos("Limpiador_piso", 8800, "Aromax"),
-    Aseos("Limpiador", 4700, "Fabuloso"),
-    Aseos("Blanqueador", 3800, "Clorox"),
-    Aseos("Suavizante", 6200, "Aromatel")
+    Aseos("Detergente-1kg-FAB", 26000, "FAB"),
+    Aseos("Limpiador-500LM-Aroxamn", 8800, "Aromax"),
+    Aseos("Limpiador-600ml-Fabuloso", 4700, "Fabuloso"),
+    Aseos("Blanqueador-1L-Clorox", 3800, "Clorox"),
+    Aseos("Suavizante-300ML-Aromatel", 6200, "Aromatel"),
+    Aseos("Suavizante-1L-Aromatel", 6200, "Aromatel")
 ]
 
 carnes_frias = [
-    CarnesFrias("Rancherax7", 12000, "Salchicha ranchera"),
-    CarnesFrias("Butifarrax18", 10000, "Butifarra"),
-    CarnesFrias("Chorizo500g", 22000, "Chorizo"),
-    CarnesFrias("Jamon400g", 10100, "Jamon Ahumado"),
-    CarnesFrias("Jamonpollo230gr", 13900, "Jamon de Pollo"),
-    CarnesFrias("Mortadela460g", 10100, "Mortadela tradicional")
+    CarnesFrias("Ranchera-x7-Cunit", 12000, "Ranchera"),
+    CarnesFrias("Ranchera-x14-Cunit", 15000, "Ranchera"),
+    CarnesFrias("Butifarra-x18-Cunit", 10000, "Cunit"),
+    CarnesFrias("Chorizo-500g-cunit", 22000, "Cunit"),
+    CarnesFrias("Jamon-400g-Delipavo", 10100, "Delipavo"),
+    CarnesFrias("Jamonpollo-230gr-Macpollo", 13900, "Macpollo"),
+    CarnesFrias("Jamonpollo-200gr-Pietram", 11900, "Pietram"),
+    CarnesFrias("Mortadela460g", 10100, "Cunit")
 ]
 
 panaderias = [
-    Panaderias("Mogolla", 1200),
-    Panaderias("Bimbonetes", 2100),
-    Panaderias("Croissantx20", 5800),
-    Panaderias("Ponque Casero", 5600),
-    Panaderias("Pan tajado", 7300)
+    Panaderias("Mogolla-x4-Guadalupe", 1200,"Guadalupe"),
+    Panaderias("Pan tajado-550gr-Guadalupe", 1200,"Guadalupe"),
+    Panaderias("Pan tajado-730gr-Bimbo",6400,"Bimbo"),
+    Panaderias("Croissant-x5-Fresscampo", 5800,"Fresscampo"),
+    Panaderias("Ponque Casero vainilla-220gr-Bimbo", 5600,"Bimbo"),
+    Panaderias("Ponque Casero marmoleado-220gr-Bimbo", 5600,"Bimbo"),
 ]
 
-tecnologias= [
-    Tecnologias("Smart_tv_40 Samgung", 7000000, "Samsung", "TV"),
-    Tecnologias("Samsung Galaxy A54", 2200000, "Samsung","Celular"),
-    Tecnologias("Lenovo Ideapad 3",2000000 , "Lenovo","Computador"),
-    Tecnologias("Sony WH-1000XM4", 1300000, "Sony","Audifonos"),
-    Tecnologias("PlayStation 5 (PS5)",2200000 , "Sony", "Consola")
+lacteos=[
+    Lacteos("Yogurt_bolsa-x8-Yogo", 4400, "Yogo Yogo"),
+    Lacteos("Yogurt_bolsa-1L-Yogo", 6000, "Yogo Yogo"),
+    Lacteos("Avena_Deslactosada",9100 , "Alpina"),
+    Lacteos("Yox", 1700, "Alpina"),
+    Lacteos("Bon Yurt", 2900, "Alpina"),
+    Lacteos("Leche_entera", 5100, "Alpina"),
 ]
 
+tecnologias = [
+    Tecnologias("Smart_tv_40 Samsung", 7000000, "Samsung", "TV"),
+    Tecnologias("Samsung Galaxy A54", 2200000, "Samsung", "Celular"),
+    Tecnologias("Lenovo Ideapad 3", 2000000, "Lenovo", "Computador"),
+    Tecnologias("Sony WH-1000XM4", 800000, "Sony", "Audífonos"),
+    Tecnologias("PlayStation 5 (PS5)", 2200000, "Sony", "Consola")
+]
 
 # Días y descuentos
 class Dia:
-    def __init__(self, dia, descuentos):
+    def __init__(self, dia, descuentos_categoria, descuentos_marca):
         self.dia = dia
-        self.descuentos = descuentos
+        self.descuentos_categoria = descuentos_categoria
+        self.descuentos_marca = descuentos_marca
+
 
 dias = [
-    Dia("Lunes", {"Verduras": 0.15}),
-    Dia("Martes", {"Carnes": 0.20}),
-    Dia("Miercoles", {"Aseos": 0.15}),
-    Dia("Jueves", {"Carnes_frias": 0.15}),
-    Dia("Viernes", {"Panaderias": 0.20}),
-    Dia("Sabado", {"Lacteos": 0.25}),
-    Dia("Domingo", {"Tecnología": 0.30})
+    Dia("Lunes", {"Verduras": 0.15}, {"Samsung": 0.10, "Alpina":0.10}),
+    Dia("Martes", {"Carnes": 0.20}, {"Lenovo":0.12,"Aromatel":0.10}),
+    Dia("Miércoles", {"Aseos": 0.15},{"FAB":0.10,"Delipavo":0.15}),
+    Dia("Jueves", {"Carnes_frias": 0.15},{"Cunit":0.9,"Bimbo":0.10}),
+    Dia("Viernes", {"Panaderias": 0.20},{"Fresscampo":0.8,"Cunit":0.11}),
+    Dia("Sábado", {"Lacteos": 0.25},{"Yogo Yogo":0.10,"Clorox":0.9}),
+    Dia("Domingo", {"Tecnología": 0.30}, {"Samsung": 0.15,"Pietram":0.6})
 ]
+
 
 # Categorías de productos
 categorias = {
@@ -113,7 +134,8 @@ categorias = {
     "Aseos": aseos,
     "Carnes_frias": carnes_frias,
     "Panaderias": panaderias,
-    "Tecnología":tecnologias
+    "Tecnología": tecnologias,
+    "Lacteos":lacteos
 }
 
 # Funciones de la interfaz
@@ -134,7 +156,9 @@ def actualizar_productos(*args):
     elif categoria_seleccionada == "Panaderias":
         productos = [p.panaderia for p in categorias[categoria_seleccionada]]
     elif categoria_seleccionada == "Tecnología":
-        productos= [p.tecnología for p in categorias[categoria_seleccionada]]
+        productos = [p.tecnología for p in categorias[categoria_seleccionada]]
+    elif categoria_seleccionada == "Lacteos":
+        productos = [p.lacteo for p in categorias[categoria_seleccionada]]
 
     producto.set('')
     menu = producto_menu["menu"]
@@ -156,16 +180,17 @@ def agregar_producto():
         return
 
     # Buscar el día seleccionado
-    descuentos_dia = {}
+    descuentos_categoria = {}
+    descuentos_marca = {}
     for d in dias:
         if d.dia == dia_seleccionado:
-            descuentos_dia = d.descuentos
+            descuentos_categoria = d.descuentos_categoria
+            descuentos_marca = d.descuentos_marca
             break
 
     # Calcular el precio total y descuento aplicado
     precio_total = 0
     kilos = 0
-    descuento_aplicado = 0
     descuento_aplicado = 0
     productos = categorias[categoria_seleccionada]
     for p in productos:
@@ -174,88 +199,138 @@ def agregar_producto():
            (categoria_seleccionada == "Aseos" and p.aseo == producto_seleccionado) or \
            (categoria_seleccionada == "Carnes_frias" and p.fria == producto_seleccionado) or \
            (categoria_seleccionada == "Panaderias" and p.panaderia == producto_seleccionado) or \
-            (categoria_seleccionada == "Tecnología" and p.tecnología == producto_seleccionado):
+           (categoria_seleccionada == "Tecnología" and p.tecnología == producto_seleccionado):
+           
             if categoria_seleccionada in ["Verduras", "Carnes"]:
                 precio_total = p.precio_por_kilo * cantidad_seleccionada
                 kilos = cantidad_seleccionada
             else:
                 precio_total = p.precio * cantidad_seleccionada
-            descuento = descuentos_dia.get(categoria_seleccionada, 0)
-            descuento_aplicado = precio_total * descuento
+
+            # Aplicar descuento por categoría
+            descuento_categoria = descuentos_categoria.get(categoria_seleccionada, 0)
+            descuento_aplicado = precio_total * descuento_categoria
             precio_total -= descuento_aplicado
+
+            # Aplicar descuento adicional por marca si el producto tiene atributo marca
+            if hasattr(p, 'marca'):
+                descuento_marca_adicional = descuentos_marca.get(p.marca, 0)
+                descuento_aplicado += precio_total * descuento_marca_adicional
+                precio_total -= precio_total * descuento_marca_adicional
+
             break
 
     # Guardar producto agregado con descuento
     productos_agregados.append((producto_seleccionado, cantidad_seleccionada, precio_total, kilos, descuento_aplicado))
     actualizar_lista()
 
+
+
+
+
 def validar_entrada(texto):
-     return texto.isdigit() or (texto.startswith('-') and texto[1:].isdigit()) or texto == ""
+    return texto.isdigit() or (texto.startswith('-') and texto[1:].isdigit()) or texto == ""
 
 def actualizar_lista():
     lista_productos.delete(0, END)
     total = 0
     for producto, cantidad, precio, kilos, descuento in productos_agregados:
         if kilos > 0:
-            lista_productos.insert(END, f"{producto} (x{kilos} kg): ${precio:.2f} (Descuento: ${descuento:.2f})")
+            if descuento > 0:
+                lista_productos.insert(END, f"{producto} (x{kilos} kg): ${precio:.2f}")
+                lista_productos.insert(END, f"  Descuento: ${descuento:.2f}")
+            else:
+                lista_productos.insert(END, f"{producto} (x{kilos} kg): ${precio:.2f}")
         else:
-            lista_productos.insert(END, f"{producto} (x{cantidad} unidades): ${precio:.2f} (Descuento: ${descuento:.2f})")
+            if descuento > 0:
+                lista_productos.insert(END, f"{producto} (x{cantidad} unidades): ${precio:.2f}")
+                lista_productos.insert(END, f"  Descuento: ${descuento:.2f}")
+            else:
+                lista_productos.insert(END, f"{producto} (x{cantidad} unidades): ${precio:.2f}")
         total += precio
     total_label.config(text=f"Total: ${total:.2f}")
 
-def reiniciar():
-    global productos_agregados
-    productos_agregados = []
-    lista_productos.delete(0, END)
-    total_label.config(text="Total: $0.00")
-    cantidad.set("")
-    producto.set("")
+def validar_usuario(usuario, contrasena):
+    return usuario == "admin" and contrasena == "1092024"
+
+def abrir_ventana_eliminar():
+    def validar_y_abrir():
+        usuario = entrada_usuario.get()
+        contrasena = entrada_contrasena.get()
+        if validar_usuario(usuario, contrasena):
+            ventana_acceso.destroy()
+            abrir_ventana_seleccion()
+        else:
+            messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
+
+    ventana_acceso = Toplevel(raiz)
+    ventana_acceso.title("Acceso Administrador")
+    ventana_acceso.geometry("300x200")
+    
+    Label(ventana_acceso, text="Usuario:").pack(pady=5)
+    entrada_usuario = Entry(ventana_acceso)
+    entrada_usuario.pack(pady=5)
+    
+    Label(ventana_acceso, text="Contraseña:").pack(pady=5)
+    entrada_contrasena = Entry(ventana_acceso, show="*")
+    entrada_contrasena.pack(pady=5)
+    
+    Button(ventana_acceso, text="Ingresar", command=validar_y_abrir).pack(pady=10)
+
+def abrir_ventana_seleccion():
+    def eliminar_seleccionados():
+        seleccionados = [i for i, var in enumerate(var_list) if var.get()]
+        for i in sorted(seleccionados, reverse=True):
+            productos_agregados.pop(i)
+        actualizar_lista()
+        ventana_eliminar.destroy()
+
+    ventana_eliminar = Toplevel(raiz)
+    ventana_eliminar.title("Eliminar Productos")
+    ventana_eliminar.geometry("500x400")
+
+    Label(ventana_eliminar, text="Selecciona los productos a eliminar:").pack(pady=10)
+
+    var_list = []
+    for producto, cantidad, precio, kilos, descuento in productos_agregados:
+        var = IntVar()
+        Checkbutton(ventana_eliminar, text=f"{producto} (x{cantidad}) - ${precio:.2f}", variable=var).pack(anchor="w")
+        var_list.append(var)
+
+    Button(ventana_eliminar, text="Eliminar Seleccionados", command=eliminar_seleccionados).pack(pady=20)
+
 def generar_factura():
-    fecha_hora = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
-    nombre_archivo = f"Factura_{fecha_hora}.txt"
-
-    with open(nombre_archivo, 'w') as archivo:
-        archivo.write(f"Factura\n")
-        archivo.write(f"Fecha: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
-        archivo.write(f"\n{'-'*50}\n")
-        archivo.write(f"{'Producto':<25} {'Cantidad':<10} {'Precio Unitario':<20} {'Descuento':<10} {'Total':<10}\n")
-        archivo.write(f"{'-'*50}\n")
-
-        total = 0
-        for producto, cantidad, precio, kilos, descuento in productos_agregados:
-            if descuento > 0:
-                descuento_str = f"{descuento*100:.0f}%"
-                precio_original = precio / (1 - descuento)
-            else:
-                descuento_str = "0%"
-                precio_original = precio
-
-            if kilos > 0:
-                archivo.write(f"{producto:<25} {kilos:<10} {precio_original / kilos:<20.2f} {descuento_str:<10} {precio:.2f}\n")
-            else:
-                archivo.write(f"{producto:<25} {cantidad:<10} {precio_original / cantidad:<20.2f} {descuento_str:<10} {precio:.2f}\n")
-                
-            total += precio
-
-        archivo.write(f"\n{'-'*50}\n")
-        archivo.write(f"{'Total':<25} {'':<10} {'':<20} {'':<10} {total:.2f}\n")
-    factura = "Factura:\n"
+    fecha = datetime.datetime.now().strftime("%d/%m/%Y")
+    factura = f"Factura - {fecha}\n"
+    factura += "-" * 50 + "\n"
+    factura += f"{'Producto':<20} {'Cantidad':<10} {'Precio Unitario':<15} {'Descuento':<15} {'Total':<15}\n"
+    factura += "-" * 50 + "\n"
+    
     total = 0
-
     for producto, cantidad, precio, kilos, descuento in productos_agregados:
         if kilos > 0:
-            factura += f"{producto} (x{kilos} kg): ${precio:.2f} (Descuento: ${descuento:.2f})\n"
+            precio_unitario = precio / kilos
+            descuento_str = f"${descuento:.2f}" if descuento > 0 else "N/A"
+            factura += f"{producto:<20} {kilos:<10} {precio_unitario:<15.2f} {descuento_str:<15} ${precio:.2f}\n"
         else:
-            factura += f"{producto} (x{cantidad} unidades): ${precio:.2f} (Descuento: ${descuento:.2f})\n"
+            precio_unitario = precio / cantidad
+            descuento_str = f"${descuento:.2f}" if descuento > 0 else "N/A"
+            factura += f"{producto:<20} {cantidad:<10} {precio_unitario:<15.2f} {descuento_str:<15} ${precio:.2f}\n"
         total += precio
-    
-    factura += "-----------------------------\n"
-    factura += f"Total: ${total:.2f}\n"
 
-    messagebox.showinfo("Factura Generada", f"La factura ha sido generada como {nombre_archivo}")
+    factura += "-" * 50 + "\n"
+    factura += f"{'Total':<45} ${total:.2f}\n"
+
+    # Guardar la factura en un archivo con nombre único basado en fecha y hora
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    nombre_archivo = f"factura_{timestamp}.txt"
+
+    with open(nombre_archivo, "w") as f:
+        f.write(factura)
 
     messagebox.showinfo("Factura Generada", f"Factura guardada como {nombre_archivo}")
     reiniciar()
+
 
 def reiniciar():
     Desp.set("")
@@ -268,7 +343,7 @@ def reiniciar():
 # Configuración de la interfaz gráfica
 raiz = Tk()
 raiz.title("Caja Registradora")
-raiz.geometry("700x500")
+raiz.geometry("800x600")
 raiz.configure(background="#f7f7f7")
 
 # Crear contenedor principal
@@ -307,8 +382,9 @@ Label(frame_izquierdo, text="Cantidad", font=("Arial", 14, "bold"), bg="#ffffff"
 cantidad = StringVar(raiz)
 entrada = StringVar()
 validacion = raiz.register(validar_entrada)
-Entry(frame_izquierdo, textvariable=entrada, validate="key", validatecommand=(validacion, '%P'))
-Entry(frame_izquierdo, textvariable=cantidad).grid(column=1, row=3, pady=5)
+Entry(frame_izquierdo, textvariable=entrada, validate="key", validatecommand=(validacion, '%P'), width=10).grid(column=1, row=3, pady=5)
+Entry(frame_izquierdo, textvariable=cantidad, width=10).grid(column=1, row=3, pady=5)
+
 Button(frame_izquierdo, text="Agregar Producto", command=agregar_producto).grid(column=0, row=4, columnspan=2, pady=10)
 
 # Botón de eliminar
@@ -319,10 +395,13 @@ frame_derecho = Frame(frame_principal, bg="#ffffff", relief="solid", borderwidth
 frame_derecho.pack(side="right", fill="both", expand=True, padx=20, pady=20)
 
 Label(frame_derecho, text="Productos Agregados", font=("Arial", 14, "bold"), bg="#ffffff").pack(pady=10)
-lista_productos = Listbox(frame_derecho, width=50, height=15, font=("Arial", 12), bg="#f0f0f0", selectmode="single")
+lista_productos = Listbox(frame_derecho, width=60, height=15, font=("Arial", 12), bg="#f0f0f0", selectmode="single")
 lista_productos.pack(pady=10)
 
 total_label = Label(frame_derecho, text="Total: $0.00", font=("Arial", 14, "bold"), bg="#ffffff")
 total_label.pack(pady=10)
+
 Button(frame_izquierdo, text="Generar Factura", command=generar_factura).grid(column=0, row=6, columnspan=2, pady=10)
+
 raiz.mainloop()
+
