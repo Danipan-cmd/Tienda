@@ -42,6 +42,20 @@ class Tecnologias:
         self.precio = precio
         self.marca = marca
         self.tipo = tipo
+class Festivo:
+    def __init__(self, festivo, descuentos_marca):
+        self.festivo = festivo
+        self.descuentos_marca = descuentos_marca
+
+festivos = [
+    Festivo(26, {"Samsung": 0.10, "Alpina": 0.10}),
+    Festivo(30, {"Lenovo": 0.12, "Aromatel": 0.10}),
+    Festivo(10, {"FAB": 0.10, "Delipavo": 0.15}),
+    Festivo(1, {"Cunit": 0.09, "Bimbo": 0.10}),
+    Festivo(15, {"Fresscampo": 0.08, "Cunit": 0.11}),
+    Festivo(20, {"Yogo Yogo": 0.10, "Clorox": 0.09}),
+    Festivo(25, {"Samsung": 0.15, "Pietram": 0.06})
+]
 
 # Listas de productos
 verduras = [
@@ -110,21 +124,22 @@ tecnologias = [
 
 # Días y descuentos
 class Dia:
-    def __init__(self, dia, descuentos_categoria, descuentos_marca):
+    def __init__(self, dia, descuentos_categoria):
         self.dia = dia
         self.descuentos_categoria = descuentos_categoria
-        self.descuentos_marca = descuentos_marca
 
 
 dias = [
-    Dia("Lunes", {"Verduras": 0.15}, {"Samsung": 0.10, "Alpina":0.10}),
-    Dia("Martes", {"Carnes": 0.20}, {"Lenovo":0.12,"Aromatel":0.10}),
-    Dia("Miércoles", {"Aseos": 0.15},{"FAB":0.10,"Delipavo":0.15}),
-    Dia("Jueves", {"Carnes_frias": 0.15},{"Cunit":0.9,"Bimbo":0.10}),
-    Dia("Viernes", {"Panaderias": 0.20},{"Fresscampo":0.8,"Cunit":0.11}),
-    Dia("Sábado", {"Lacteos": 0.25},{"Yogo Yogo":0.10,"Clorox":0.9}),
-    Dia("Domingo", {"Tecnología": 0.30}, {"Samsung": 0.15,"Pietram":0.6})
+    Dia("Lunes", {"Verduras": 0.15}),
+    Dia("Martes", {"Carnes": 0.20}),
+    Dia("Miércoles", {"Aseos": 0.15}),
+    Dia("Jueves", {"Carnes_frias": 0.15}),
+    Dia("Viernes", {"Panaderias": 0.20}),
+    Dia("Sábado", {"Lacteos": 0.25}),
+    Dia("Domingo", {"Tecnología": 0.30})
 ]
+
+
 
 
 # Categorías de productos
@@ -168,6 +183,7 @@ def actualizar_productos(*args):
 
 def agregar_producto():
     dia_seleccionado = Desp.get()
+    festivo_seleccionado = Desp.get()
     categoria_seleccionada = categoria.get()
     producto_seleccionado = producto.get()
     
@@ -185,9 +201,11 @@ def agregar_producto():
     for d in dias:
         if d.dia == dia_seleccionado:
             descuentos_categoria = d.descuentos_categoria
+            break
+    for f in festivos:
+        if f.festivo== festivo_seleccionado:
             descuentos_marca = d.descuentos_marca
             break
-
     # Calcular el precio total y descuento aplicado
     precio_total = 0
     kilos = 0
@@ -380,30 +398,35 @@ Desp = StringVar(raiz)
 Desp.set("")
 opciones = [d.dia for d in dias]
 OptionMenu(frame_izquierdo, Desp, *opciones).grid(column=1, row=0, pady=10)
+Label(frame_izquierdo, text="Día festivo", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=1, pady=10)
+DespFestivo = StringVar(raiz)
+DespFestivo.set("")  
+opciones_festivo = [f.festivo for f in festivos]
+OptionMenu(frame_izquierdo, DespFestivo, *opciones_festivo).grid(column=1, row=1, pady=5)
 
-Label(frame_izquierdo, text="Categoría", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=1, pady=5)
+Label(frame_izquierdo, text="Categoría", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=2, pady=5)
 categoria = StringVar(raiz)
 categoria.set("")
 categoria_menu = OptionMenu(frame_izquierdo, categoria, *categorias.keys())
-categoria_menu.grid(column=1, row=1, pady=5)
+categoria_menu.grid(column=1, row=2, pady=5)
 categoria.trace("w", actualizar_productos)
 
-Label(frame_izquierdo, text="Producto", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=2, pady=5)
+Label(frame_izquierdo, text="Producto", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=3, pady=5)
 producto = StringVar(raiz)
 producto_menu = OptionMenu(frame_izquierdo, producto, [])
-producto_menu.grid(column=1, row=2, pady=5)
+producto_menu.grid(column=1, row=3, pady=5)
 
-Label(frame_izquierdo, text="Cantidad", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=3, pady=5)
+Label(frame_izquierdo, text="Cantidad", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=4, pady=5)
 cantidad = StringVar(raiz)
 entrada = StringVar()
 validacion = raiz.register(validar_entrada)
-Entry(frame_izquierdo, textvariable=entrada, validate="key", validatecommand=(validacion, '%P'), width=10).grid(column=1, row=3, pady=5)
-Entry(frame_izquierdo, textvariable=cantidad, width=10).grid(column=1, row=3, pady=5)
+Entry(frame_izquierdo, textvariable=entrada, validate="key", validatecommand=(validacion, '%P'), width=10).grid(column=1, row=4, pady=5)
+Entry(frame_izquierdo, textvariable=cantidad, width=10).grid(column=1, row=4, pady=5)
 
-Button(frame_izquierdo, text="Agregar Producto", command=agregar_producto).grid(column=0, row=4, columnspan=2, pady=10)
+Button(frame_izquierdo, text="Agregar Producto", command=agregar_producto).grid(column=0, row=5, columnspan=2, pady=10)
 
 # Botón de eliminar
-Button(frame_izquierdo, text="Eliminar", command=abrir_ventana_eliminar).grid(column=0, row=5, columnspan=2, pady=10)
+Button(frame_izquierdo, text="Eliminar", command=abrir_ventana_eliminar).grid(column=0, row=6, columnspan=2, pady=10)
 
 # Contenedor derecho para la lista de productos agregados y total
 frame_derecho = Frame(frame_principal, bg="#ffffff", relief="solid", borderwidth=2)
