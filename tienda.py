@@ -1,4 +1,5 @@
-from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END
+from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END, Frame, messagebox, font
+from tkinter import ttk
 
 # Definición de clases
 class Verduras:
@@ -125,7 +126,13 @@ def agregar_producto():
     dia_seleccionado = Desp.get()
     categoria_seleccionada = categoria.get()
     producto_seleccionado = producto.get()
-    cantidad_seleccionada = float(cantidad.get())
+    try:
+        cantidad_seleccionada = float(cantidad.get())
+        if cantidad_seleccionada <= 0:
+            raise ValueError("La cantidad debe ser mayor que cero.")
+    except ValueError as e:
+        messagebox.showerror("Error", f"Cantidad inválida: {e}")
+        return
 
     # Buscar el día seleccionado
     descuentos_dia = {}
@@ -136,6 +143,7 @@ def agregar_producto():
 
     # Calcular el precio total
     precio_total = 0
+    kilos = 0
     productos = categorias[categoria_seleccionada]
     for p in productos:
         if (categoria_seleccionada == "Verduras" and p.verdura == producto_seleccionado) or \
@@ -143,50 +151,92 @@ def agregar_producto():
            (categoria_seleccionada == "Aseos" and p.aseo == producto_seleccionado) or \
            (categoria_seleccionada == "Carnes_frias" and p.fria == producto_seleccionado) or \
            (categoria_seleccionada == "Panaderias" and p.panaderia == producto_seleccionado):
-            precio_total = p.precio_por_kilo * cantidad_seleccionada if categoria_seleccionada in ["Verduras", "Carnes"] else p.precio * cantidad_seleccionada
+            if categoria_seleccionada in ["Verduras", "Carnes"]:
+                precio_total = p.precio_por_kilo * cantidad_seleccionada
+                kilos = cantidad_seleccionada
+            else:
+                precio_total = p.precio * cantidad_seleccionada
             descuento = descuentos_dia.get(categoria_seleccionada, 0)
             precio_total -= precio_total * descuento
             break
 
     # Guardar producto agregado
-    productos_agregados.append((producto_seleccionado, precio_total))
+    productos_agregados.append((producto_seleccionado, cantidad_seleccionada, precio_total, kilos))
     actualizar_lista()
 
 def actualizar_lista():
     lista_productos.delete(0, END)
-    for producto, precio in productos_agregados:
-        lista_productos.insert(END, f"{producto}: ${precio:.2f}")
+    total = 0
+    for producto, cantidad, precio, kilos in productos_agregados:
+        if kilos > 0:
+            lista_productos.insert(END, f"{producto} (x{kilos} kg): ${precio:.2f}")
+        else:
+            lista_productos.insert(END, f"{producto} (x{cantidad} unidades): ${precio:.2f}")
+        total += precio
+    total_label.config(text=f"Total: ${total:.2f}")
+
+def reiniciar():
+    global productos_agregados
+    productos_agregados = []
+    lista_productos.delete(0, END)
+    total_label.config(text="Total: $0.00")
+    cantidad.set("")
+    producto.set("")
 
 # Configuración de la interfaz gráfica
 raiz = Tk()
 raiz.title("Caja Registradora")
-raiz.geometry("500x500")
-raiz.configure(background="#aba6a4")
+raiz.geometry("700x500")
+raiz.configure(background="#f7f7f7")
 
-Label(raiz, text="Introduce el día de la semana", font=("Arial", 14)).grid(column=0, row=0, padx=10, pady=10)
+# Crear contenedor principal
+frame_principal = Frame(raiz, bg="#f7f7f7")
+frame_principal.pack(expand=True, fill="both")
+
+# Contenedor izquierdo para la selección de productos
+frame_izquierdo = Frame(frame_principal, bg="#ffffff", relief="solid", borderwidth=2)
+frame_izquierdo.pack(side="left", fill="y", padx=20, pady=20)
+
+# Estilos
+estilo = ttk.Style()
+estilo.configure("TLabel", font=("Arial", 12), background="#ffffff")
+estilo.configure("TButton", font=("Arial", 12), padding=6)
+estilo.configure("TEntry", font=("Arial", 12), padding=6)
+
+Label(frame_izquierdo, text="Día de la semana", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=0, pady=10)
 Desp = StringVar(raiz)
-Desp.set(dias[0].dia)
-OptionMenu(raiz, Desp, *[d.dia for d in dias]).grid(column=1, row=0, padx=10, pady=10)
+Desp.set("")
+opciones = [d.dia for d in dias]
+OptionMenu(frame_izquierdo, Desp, *opciones).grid(column=1, row=0, pady=10)
 
-Label(raiz, text="Selecciona la categoría", font=("Arial", 14)).grid(column=0, row=1, padx=10, pady=10)
+Label(frame_izquierdo, text="Categoría", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=1, pady=5)
 categoria = StringVar(raiz)
 categoria.set("Verduras")
-OptionMenu(raiz, categoria, *categorias.keys(), command=actualizar_productos).grid(column=1, row=1, padx=10, pady=10)
+categoria_menu = OptionMenu(frame_izquierdo, categoria, *categorias.keys())
+categoria_menu.grid(column=1, row=1, pady=5)
+categoria.trace("w", actualizar_productos)
 
-Label(raiz, text="Selecciona el producto", font=("Arial", 14)).grid(column=0, row=2, padx=10, pady=10)
+Label(frame_izquierdo, text="Producto", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=2, pady=5)
 producto = StringVar(raiz)
-producto_menu = OptionMenu(raiz, producto, "")
-producto_menu.grid(column=1, row=2, padx=10, pady=10)
-actualizar_productos()
+producto_menu = OptionMenu(frame_izquierdo, producto, [])
+producto_menu.grid(column=1, row=2, pady=5)
 
-Label(raiz, text="Introduce la cantidad (kg/unidades)", font=("Arial", 14)).grid(column=0, row=3, padx=10, pady=10)
+Label(frame_izquierdo, text="Cantidad", font=("Arial", 14, "bold"), bg="#ffffff").grid(column=0, row=3, pady=5)
 cantidad = StringVar(raiz)
-Entry(raiz, textvariable=cantidad).grid(column=1, row=3, padx=10, pady=10)
+Entry(frame_izquierdo, textvariable=cantidad).grid(column=1, row=3, pady=5)
 
-Button(raiz, text="Agregar Producto", command=agregar_producto).grid(column=0, row=4, columnspan=2, pady=10)
+Button(frame_izquierdo, text="Agregar Producto", command=agregar_producto).grid(column=0, row=4, columnspan=2, pady=10)
+Button(frame_izquierdo, text="Reiniciar", command=reiniciar).grid(column=0, row=5, columnspan=2, pady=10)
 
-Label(raiz, text="Productos Agregados", font=("Arial", 14)).grid(column=0, row=5, padx=10, pady=10)
-lista_productos = Listbox(raiz, width=50, height=10)
-lista_productos.grid(column=0, row=6, columnspan=2, padx=10, pady=10)
+# Contenedor derecho para mostrar los productos
+frame_derecho = Frame(frame_principal, bg="#ffffff", relief="solid", borderwidth=2)
+frame_derecho.pack(side="right", fill="both", expand=True, padx=20, pady=20)
+
+Label(frame_derecho, text="Productos Agregados", font=("Arial", 14, "bold"), bg="#ffffff").pack(pady=10)
+lista_productos = Listbox(frame_derecho, width=50, height=15, font=("Arial", 12), bg="#f0f0f0", selectmode="single")
+lista_productos.pack(pady=10)
+
+total_label = Label(frame_derecho, text="Total: $0.00", font=("Arial", 14, "bold"), bg="#ffffff")
+total_label.pack(pady=10)
 
 raiz.mainloop()
