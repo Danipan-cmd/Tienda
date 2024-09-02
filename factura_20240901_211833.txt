@@ -1,7 +1,0 @@
-Factura de Compra
------------------------------
-Día: Martes
-
-Detergente (x1.0 unidades): $26000.00 (Descuento: $0.00)
------------------------------
-Total: $26000.00

@@ -199,7 +199,8 @@ def agregar_producto():
            (categoria_seleccionada == "Aseos" and p.aseo == producto_seleccionado) or \
            (categoria_seleccionada == "Carnes_frias" and p.fria == producto_seleccionado) or \
            (categoria_seleccionada == "Panaderias" and p.panaderia == producto_seleccionado) or \
-           (categoria_seleccionada == "Tecnología" and p.tecnología == producto_seleccionado):
+           (categoria_seleccionada == "Tecnología" and p.tecnología == producto_seleccionado) or \
+           (categoria_seleccionada == "Lacteos" and p.lacteo == producto_seleccionado):
            
             if categoria_seleccionada in ["Verduras", "Carnes"]:
                 precio_total = p.precio_por_kilo * cantidad_seleccionada
@@ -220,9 +221,23 @@ def agregar_producto():
 
             break
 
-    # Guardar producto agregado con descuento
+    # Verificar si el producto ya ha sido agregado
+    for i, (prod, cant, precio, kg, desc) in enumerate(productos_agregados):
+        if prod == producto_seleccionado:
+            # Actualizar la cantidad y el precio total
+            nueva_cantidad = cant + cantidad_seleccionada
+            nuevo_precio_total = (precio / cant) * nueva_cantidad
+            descuento_total = desc + descuento_aplicado
+
+            productos_agregados[i] = (prod, nueva_cantidad, nuevo_precio_total, kg + kilos, descuento_total)
+            actualizar_lista()
+            return
+
+    # Guardar producto agregado con descuento si no estaba antes
     productos_agregados.append((producto_seleccionado, cantidad_seleccionada, precio_total, kilos, descuento_aplicado))
     actualizar_lista()
+
+
 
 
 
