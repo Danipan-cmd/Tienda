@@ -1,5 +1,5 @@
 from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END
-
+total_acumulado = 0
 # Definición de clases
 class Verduras:
     def __init__(self, verdura, precio_por_kilo): 
@@ -146,17 +146,12 @@ def agregar_producto():
             precio_total = p.precio_por_kilo * cantidad_seleccionada if categoria_seleccionada in ["Verduras", "Carnes"] else p.precio * cantidad_seleccionada
             descuento = descuentos_dia.get(categoria_seleccionada, 0)
             precio_total -= precio_total * descuento
-            break
-
-    # Guardar producto agregado
-    productos_agregados.append((producto_seleccionado, precio_total))
-    actualizar_lista()
-
+        break
 def actualizar_lista():
     lista_productos.delete(0, END)
     for producto, precio in productos_agregados:
         lista_productos.insert(END, f"{producto}: ${precio:.2f}")
-
+        
 # Configuración de la interfaz gráfica
 raiz = Tk()
 raiz.title("Caja Registradora")
@@ -188,5 +183,6 @@ Button(raiz, text="Agregar Producto", command=agregar_producto).grid(column=0, r
 Label(raiz, text="Productos Agregados", font=("Arial", 14)).grid(column=0, row=5, padx=10, pady=10)
 lista_productos = Listbox(raiz, width=50, height=10)
 lista_productos.grid(column=0, row=6, columnspan=2, padx=10, pady=10)
+
 
 raiz.mainloop()
