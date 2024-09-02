@@ -1,6 +1,7 @@
-from tkinter import Tk, StringVar, Frame, Label, OptionMenu, Entry, Button, Listbox, END, messagebox, Toplevel, Checkbutton, IntVar, ttk
+from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END, Frame, messagebox, font
+from tkinter import ttk
 import datetime
-
+import os
 # Definición de clases
 class Verduras:
     def __init__(self, verdura, precio_por_kilo): 
@@ -165,6 +166,7 @@ def agregar_producto():
     precio_total = 0
     kilos = 0
     descuento_aplicado = 0
+    descuento_aplicado = 0
     productos = categorias[categoria_seleccionada]
     for p in productos:
         if (categoria_seleccionada == "Verduras" and p.verdura == producto_seleccionado) or \
@@ -201,56 +203,42 @@ def actualizar_lista():
         total += precio
     total_label.config(text=f"Total: ${total:.2f}")
 
-def validar_usuario(usuario, contrasena):
-    return usuario == "admin" and contrasena == "1092024"
-
-def abrir_ventana_eliminar():
-    def validar_y_abrir():
-        usuario = entrada_usuario.get()
-        contrasena = entrada_contrasena.get()
-        if validar_usuario(usuario, contrasena):
-            ventana_acceso.destroy()
-            abrir_ventana_seleccion()
-        else:
-            messagebox.showerror("Error", "Usuario o contraseña incorrectos.")
-
-    ventana_acceso = Toplevel(raiz)
-    ventana_acceso.title("Acceso Administrador")
-    ventana_acceso.geometry("300x200")
-    
-    Label(ventana_acceso, text="Usuario:").pack(pady=5)
-    entrada_usuario = Entry(ventana_acceso)
-    entrada_usuario.pack(pady=5)
-    
-    Label(ventana_acceso, text="Contraseña:").pack(pady=5)
-    entrada_contrasena = Entry(ventana_acceso, show="*")
-    entrada_contrasena.pack(pady=5)
-    
-    Button(ventana_acceso, text="Ingresar", command=validar_y_abrir).pack(pady=10)
-
-def abrir_ventana_seleccion():
-    def eliminar_seleccionados():
-        seleccionados = [i for i, var in enumerate(var_list) if var.get()]
-        for i in sorted(seleccionados, reverse=True):
-            productos_agregados.pop(i)
-        actualizar_lista()
-        ventana_eliminar.destroy()
-
-    ventana_eliminar = Toplevel(raiz)
-    ventana_eliminar.title("Eliminar Productos")
-    ventana_eliminar.geometry("400x400")
-
-    Label(ventana_eliminar, text="Selecciona los productos a eliminar:").pack(pady=10)
-
-    var_list = []
-    for producto, cantidad, precio, kilos, descuento in productos_agregados:
-        var = IntVar()
-        Checkbutton(ventana_eliminar, text=f"{producto} (x{cantidad}) - ${precio:.2f}", variable=var).pack(anchor="w")
-        var_list.append(var)
-
-    Button(ventana_eliminar, text="Eliminar Seleccionados", command=eliminar_seleccionados).pack(pady=20)
-
+def reiniciar():
+    global productos_agregados
+    productos_agregados = []
+    lista_productos.delete(0, END)
+    total_label.config(text="Total: $0.00")
+    cantidad.set("")
+    producto.set("")
 def generar_factura():
+    fecha_hora = datetime.datetime.now().strftime('%Y%m%d_%H%M%S')
+    nombre_archivo = f"Factura_{fecha_hora}.txt"
+
+    with open(nombre_archivo, 'w') as archivo:
+        archivo.write(f"Factura\n")
+        archivo.write(f"Fecha: {datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')}\n")
+        archivo.write(f"\n{'-'*50}\n")
+        archivo.write(f"{'Producto':<25} {'Cantidad':<10} {'Precio Unitario':<20} {'Descuento':<10} {'Total':<10}\n")
+        archivo.write(f"{'-'*50}\n")
+
+        total = 0
+        for producto, cantidad, precio, kilos, descuento in productos_agregados:
+            if descuento > 0:
+                descuento_str = f"{descuento*100:.0f}%"
+                precio_original = precio / (1 - descuento)
+            else:
+                descuento_str = "0%"
+                precio_original = precio
+
+            if kilos > 0:
+                archivo.write(f"{producto:<25} {kilos:<10} {precio_original / kilos:<20.2f} {descuento_str:<10} {precio:.2f}\n")
+            else:
+                archivo.write(f"{producto:<25} {cantidad:<10} {precio_original / cantidad:<20.2f} {descuento_str:<10} {precio:.2f}\n")
+                
+            total += precio
+
+        archivo.write(f"\n{'-'*50}\n")
+        archivo.write(f"{'Total':<25} {'':<10} {'':<20} {'':<10} {total:.2f}\n")
     factura = "Factura:\n"
     total = 0
 
@@ -264,12 +252,7 @@ def generar_factura():
     factura += "-----------------------------\n"
     factura += f"Total: ${total:.2f}\n"
 
-    # Guardar la factura en un archivo con nombre único basado en fecha y hora
-    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    nombre_archivo = f"factura_{timestamp}.txt"
-
-    with open(nombre_archivo, "w") as f:
-        f.write(factura)
+    messagebox.showinfo("Factura Generada", f"La factura ha sido generada como {nombre_archivo}")
 
     messagebox.showinfo("Factura Generada", f"Factura guardada como {nombre_archivo}")
     reiniciar()
@@ -342,5 +325,4 @@ lista_productos.pack(pady=10)
 total_label = Label(frame_derecho, text="Total: $0.00", font=("Arial", 14, "bold"), bg="#ffffff")
 total_label.pack(pady=10)
 Button(frame_izquierdo, text="Generar Factura", command=generar_factura).grid(column=0, row=6, columnspan=2, pady=10)
-
 raiz.mainloop()
