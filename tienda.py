@@ -28,6 +28,13 @@ class Panaderias:
     def __init__(self, panaderia, precio):
         self.panaderia = panaderia
         self.precio = precio
+        
+class Tecnologias: 
+    def __init__(self, tecnología, precio, marca,tipo):
+        self.tecnología = tecnología
+        self.precio = precio
+        self.marca = marca
+        self.tipo=tipo
 
 # Listas de productos
 verduras = [
@@ -73,6 +80,15 @@ panaderias = [
     Panaderias("Pan tajado", 7300)
 ]
 
+tecnologias= [
+    Tecnologias("Smart_tv_40 Samgung", 7000000, "Samsung", "TV"),
+    Tecnologias("Samsung Galaxy A54", 2200000, "Samsung","Celular"),
+    Tecnologias("Lenovo Ideapad 3",2000000 , "Lenovo","Computador"),
+    Tecnologias("Sony WH-1000XM4", 1300000, "Sony","Audifonos"),
+    Tecnologias("PlayStation 5 (PS5)",2200000 , "Sony", "Consola")
+]
+
+
 # Días y descuentos
 class Dia:
     def __init__(self, dia, descuentos):
@@ -86,7 +102,7 @@ dias = [
     Dia("Jueves", {"Carnes_frias": 0.15}),
     Dia("Viernes", {"Panaderias": 0.20}),
     Dia("Sabado", {"Lacteos": 0.25}),
-    Dia("Domingo", {"Tecnologia": 0.30})
+    Dia("Domingo", {"Tecnología": 0.30})
 ]
 
 # Categorías de productos
@@ -95,7 +111,8 @@ categorias = {
     "Carnes": carnes,
     "Aseos": aseos,
     "Carnes_frias": carnes_frias,
-    "Panaderias": panaderias
+    "Panaderias": panaderias,
+    "Tecnología":tecnologias
 }
 
 # Funciones de la interfaz
@@ -115,6 +132,8 @@ def actualizar_productos(*args):
         productos = [p.fria for p in categorias[categoria_seleccionada]]
     elif categoria_seleccionada == "Panaderias":
         productos = [p.panaderia for p in categorias[categoria_seleccionada]]
+    elif categoria_seleccionada == "Tecnología":
+        productos= [p.tecnología for p in categorias[categoria_seleccionada]]
 
     producto.set('')
     menu = producto_menu["menu"]
@@ -152,7 +171,8 @@ def agregar_producto():
            (categoria_seleccionada == "Carnes" and p.carne == producto_seleccionado) or \
            (categoria_seleccionada == "Aseos" and p.aseo == producto_seleccionado) or \
            (categoria_seleccionada == "Carnes_frias" and p.fria == producto_seleccionado) or \
-           (categoria_seleccionada == "Panaderias" and p.panaderia == producto_seleccionado):
+           (categoria_seleccionada == "Panaderias" and p.panaderia == producto_seleccionado) or \
+            (categoria_seleccionada == "Tecnología" and p.tecnología == producto_seleccionado):
             if categoria_seleccionada in ["Verduras", "Carnes"]:
                 precio_total = p.precio_por_kilo * cantidad_seleccionada
                 kilos = cantidad_seleccionada
