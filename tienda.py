@@ -1,117 +1,184 @@
-from tkinter import Tk, StringVar, OptionMenu, Label
+from tkinter import Tk, StringVar, OptionMenu, Label, Entry, Button, Listbox, END
+
+# Definición de clases
 class Verduras:
     def __init__(self, verdura, precio_por_kilo): 
         self.verdura = verdura
         self.precio_por_kilo = precio_por_kilo
-verdura1 = Verduras("Tomate", 1700)
-verdura2 = Verduras("Zanahoria", 1600)
-verdura3 = Verduras("Lechuga", 1800)
-verdura4 = Verduras("Pepino", 1600)
-verdura5 = Verduras("Cebolla", 3200)
-verdura6 = Verduras("Pimenton", 3800)
-verdura7 = Verduras("Perejil", 14000)
-
 
 class Carnes: 
     def __init__(self, carne, precio_por_kilo):
         self.carne = carne
         self.precio_por_kilo = precio_por_kilo
-carne1 = Carnes("Molida", 29000)
-carne2 = Carnes("Costilla", 21000)
-carne3 = Carnes("Panza", 23000)
-carne4 = Carnes("Lengua", 22000)
-carne5 = Carnes("Higado", 19000)
 
- 
 class Aseos: 
     def __init__(self, aseo, precio, marca):
         self.aseo = aseo
         self.precio = precio
         self.marca = marca
-aseo1 = Aseos("Detergente", 26000, "FAB")
-aseo2 = Aseos("Limpiador_piso", 8800, "Aromax")
-aseo3 = Aseos("Limpiador", 4700, "Fabuloso")
-aseo4 = Aseos("Blanqueador", 3800, "Clorox")
-aseo5 = Aseos("Suavizante", 6200, "Aromatel")
 
-
-
-class Carnes_frias: 
+class CarnesFrias: 
     def __init__(self, fria, precio, marca):
         self.fria = fria
         self.precio = precio
         self.marca = marca
-fria1 = Carnes_frias("Rancherax7", 12000, "Salchicha ranchera")
-fria2 = Carnes_frias("Butifarrax18", 10000, "Butifarra")
-fria3 = Carnes_frias("Chorizo500g", 22000, "Chorizo")
-fria4 = Carnes_frias("Jamon400g", 10100, "Jamon Ahumado")
-fria5 = Carnes_frias("Jamonpollo230gr", 13900, "Jamon de Pollo")
-fria6 = Carnes_frias("Mortadela460g", 10100, "Mortadela tradicional")
 
-
-
-class panaderías: 
-    def __init__(self, panadería, precio):
-        self.panadería = panadería
+class Panaderias: 
+    def __init__(self, panaderia, precio):
+        self.panaderia = panaderia
         self.precio = precio
-panadería1 = panaderías("Mogolla", 1200)
-panadería2 = panaderías("Bimbonetes", 2100)
-panadería3 = panaderías("Croissantx20", 5800)
-panadería4 = panaderías("Ponque Casero", 5600)
-panadería5 = panaderías("Pan tajado", 7300)
 
+# Listas de productos
+verduras = [
+    Verduras("Tomate", 1700),
+    Verduras("Zanahoria", 1600),
+    Verduras("Lechuga", 1800),
+    Verduras("Pepino", 1600),
+    Verduras("Cebolla", 3200),
+    Verduras("Pimenton", 3800),
+    Verduras("Perejil", 14000)
+]
 
-class lacteos: 
-    def __init__(self, lacteo, precio, marca):
-        self.lacteo = lacteo
-        self.precio = precio
-        self.marca = marca
-lacteo1 = lacteos("Yogurt bolsa", 4400, "Yogo Yogo")
-lacteo2 = lacteos("Avena Deslactosada",9100 , "Alpina")
-lacteo3 = lacteos("Yox", 1700, "Alpina")
-lacteo4 = lacteos("Bon Yurt", 2900, "Alpina")
-lacteo5 = lacteos("Leche entera", 5100, "Alpina")
+carnes = [
+    Carnes("Molida", 29000),
+    Carnes("Costilla", 21000),
+    Carnes("Panza", 23000),
+    Carnes("Lengua", 22000),
+    Carnes("Higado", 19000)
+]
 
-class tecnologías: 
-    def __init__(self, tecnología, precio, marca):
-        self.tecnología = tecnología
-        self.precio = precio
-        self.marca = marca
-tecnología1 = tecnologías("Smart tv 40", 3000000, "Samsung")
-tecnología2 = tecnologías("Celular", 2200000, "Samsung Galaxy A54")
-tecnología3 = tecnologías("Computador",2000000 , "Lenovo Ideapad 3")
-tecnología4 = tecnologías("Audifonos", 1300000, "Sony WH-1000XM4")
-tecnología5 = tecnologías("PlayStation 5 (PS5)",2200000 , "Samsung")
+aseos = [
+    Aseos("Detergente", 26000, "FAB"),
+    Aseos("Limpiador_piso", 8800, "Aromax"),
+    Aseos("Limpiador", 4700, "Fabuloso"),
+    Aseos("Blanqueador", 3800, "Clorox"),
+    Aseos("Suavizante", 6200, "Aromatel")
+]
 
-class dia:
+carnes_frias = [
+    CarnesFrias("Rancherax7", 12000, "Salchicha ranchera"),
+    CarnesFrias("Butifarrax18", 10000, "Butifarra"),
+    CarnesFrias("Chorizo500g", 22000, "Chorizo"),
+    CarnesFrias("Jamon400g", 10100, "Jamon Ahumado"),
+    CarnesFrias("Jamonpollo230gr", 13900, "Jamon de Pollo"),
+    CarnesFrias("Mortadela460g", 10100, "Mortadela tradicional")
+]
+
+panaderias = [
+    Panaderias("Mogolla", 1200),
+    Panaderias("Bimbonetes", 2100),
+    Panaderias("Croissantx20", 5800),
+    Panaderias("Ponque Casero", 5600),
+    Panaderias("Pan tajado", 7300)
+]
+
+# Días y descuentos
+class Dia:
     def __init__(self, dia, descuentos):
         self.dia = dia
         self.descuentos = descuentos
-d1 = dia("Lunes", {"Verduras":0.15})
-d2 = dia("Martes", {"Carnes":0.20})
-d3 = dia("Miercoles", {"Aseo":0.15})
-d4 = dia("Jueves", {"Carnes_frias":0.15})
-d5 = dia("Viernes", {"panaderias":0.20})
-d6 = dia("Sabado", {"lacteos":0.25})
-d7 = dia("Domingo", {"tecnología":0.30})   
+
+dias = [
+    Dia("Lunes", {"Verduras": 0.15}),
+    Dia("Martes", {"Carnes": 0.20}),
+    Dia("Miercoles", {"Aseos": 0.15}),
+    Dia("Jueves", {"Carnes_frias": 0.15}),
+    Dia("Viernes", {"Panaderias": 0.20}),
+    Dia("Sabado", {"Lacteos": 0.25}),
+    Dia("Domingo", {"Tecnologia": 0.30})
+]
+
+# Categorías de productos
+categorias = {
+    "Verduras": verduras,
+    "Carnes": carnes,
+    "Aseos": aseos,
+    "Carnes_frias": carnes_frias,
+    "Panaderias": panaderias
+}
+
+# Funciones de la interfaz
+def actualizar_productos(*args):
+    categoria_seleccionada = categoria.get()
+    productos = []
+
+    if categoria_seleccionada == "Verduras":
+        productos = [p.verdura for p in categorias[categoria_seleccionada]]
+    elif categoria_seleccionada == "Carnes":
+        productos = [p.carne for p in categorias[categoria_seleccionada]]
+    elif categoria_seleccionada == "Aseos":
+        productos = [p.aseo for p in categorias[categoria_seleccionada]]
+    elif categoria_seleccionada == "Carnes_frias":
+        productos = [p.fria for p in categorias[categoria_seleccionada]]
+    elif categoria_seleccionada == "Panaderias":
+        productos = [p.panaderia for p in categorias[categoria_seleccionada]]
+
+    producto.set(productos[0])
+    menu = producto_menu["menu"]
+    menu.delete(0, "end")
+    for prod in productos:
+        menu.add_command(label=prod, command=lambda value=prod: producto.set(value))
+
+def calcular_precio():
+    dia_seleccionado = Desp.get()
+    categoria_seleccionada = categoria.get()
+    producto_seleccionado = producto.get()
+    cantidad_seleccionada = float(cantidad.get())
+
+    # Buscar el día seleccionado
+    descuentos_dia = {}
+    for d in dias:
+        if d.dia == dia_seleccionado:
+            descuentos_dia = d.descuentos
+            break
+
+    # Calcular el precio total
+    precio_total = 0
+    productos = categorias[categoria_seleccionada]
+    for p in productos:
+        if (categoria_seleccionada == "Verduras" and p.verdura == producto_seleccionado) or \
+           (categoria_seleccionada == "Carnes" and p.carne == producto_seleccionado) or \
+           (categoria_seleccionada == "Aseos" and p.aseo == producto_seleccionado) or \
+           (categoria_seleccionada == "Carnes_frias" and p.fria == producto_seleccionado) or \
+           (categoria_seleccionada == "Panaderias" and p.panaderia == producto_seleccionado):
+            precio_total = p.precio_por_kilo * cantidad_seleccionada if categoria_seleccionada in ["Verduras", "Carnes"] else p.precio * cantidad_seleccionada
+            descuento = descuentos_dia.get(categoria_seleccionada, 0)
+            precio_total -= precio_total * descuento
+            break
+
+    # Mostrar el precio calculado
+    resultado.insert(END, f"{producto_seleccionado}: ${precio_total:.2f}\n")
+
+# Configuración de la interfaz gráfica
 raiz = Tk()
-raiz.title("Ventas")
-raiz.minsize(width=300, height=400)
-etiqueta1 = Label(raiz, text="Introduce el día de la semana", font=("Arial", 14))
-etiqueta1.grid (column=0,row=1)
-raiz.geometry("300x300+1200+100")
-raiz.configure (background="#aba6a4")
-Desp=StringVar(raiz)
-Desp.set("")
-opciones = [d1.dia, d2.dia, d3.dia, d4.dia, d5.dia, d6.dia, d7.dia]
-opcion = OptionMenu(raiz,Desp, *opciones)
-opcion.grid(column=0,row=2)
-etiqueta1 = Label(raiz, text="Intoducir producto", font=("Arial", 14))
-etiqueta1.grid (column=0,row=3)
-etiqueta1 = Label(raiz, text="Intoducir marca", font=("Arial", 14))
-etiqueta1.grid (column=0,row=5)
+raiz.title("Caja Registradora")
+raiz.geometry("400x400")
+raiz.configure(background="#aba6a4")
 
+Label(raiz, text="Introduce el día de la semana", font=("Arial", 14)).grid(column=0, row=0, padx=10, pady=10)
+Desp = StringVar(raiz)
+Desp.set(dias[0].dia)
+OptionMenu(raiz, Desp, *[d.dia for d in dias]).grid(column=1, row=0, padx=10, pady=10)
 
+Label(raiz, text="Selecciona la categoría", font=("Arial", 14)).grid(column=0, row=1, padx=10, pady=10)
+categoria = StringVar(raiz)
+categoria.set("Verduras")
+OptionMenu(raiz, categoria, *categorias.keys(), command=actualizar_productos).grid(column=1, row=1, padx=10, pady=10)
 
+Label(raiz, text="Selecciona el producto", font=("Arial", 14)).grid(column=0, row=2, padx=10, pady=10)
+producto = StringVar(raiz)
+producto_menu = OptionMenu(raiz, producto, "")
+producto_menu.grid(column=1, row=2, padx=10, pady=10)
+actualizar_productos()
+
+Label(raiz, text="Introduce la cantidad (kg/unidades)", font=("Arial", 14)).grid(column=0, row=3, padx=10, pady=10)
+cantidad = StringVar(raiz)
+Entry(raiz, textvariable=cantidad).grid(column=1, row=3, padx=10, pady=10)
+
+Button(raiz, text="Calcular Precio", command=calcular_precio).grid(column=0, row=4, columnspan=2, pady=10)
+
+Label(raiz, text="Resultados", font=("Arial", 14)).grid(column=0, row=5, padx=10, pady=10)
+resultado = Listbox(raiz, height=8, width=40)
+resultado.grid(column=0, row=6, columnspan=2, padx=10, pady=10)
 
 raiz.mainloop()
