@@ -98,6 +98,8 @@ categorias = {
 }
 
 # Funciones de la interfaz
+productos_agregados = []
+
 def actualizar_productos(*args):
     categoria_seleccionada = categoria.get()
     productos = []
@@ -119,7 +121,7 @@ def actualizar_productos(*args):
     for prod in productos:
         menu.add_command(label=prod, command=lambda value=prod: producto.set(value))
 
-def calcular_precio():
+def agregar_producto():
     dia_seleccionado = Desp.get()
     categoria_seleccionada = categoria.get()
     producto_seleccionado = producto.get()
@@ -146,13 +148,19 @@ def calcular_precio():
             precio_total -= precio_total * descuento
             break
 
-    # Mostrar el precio calculado
-    resultado.insert(END, f"{producto_seleccionado}: ${precio_total:.2f}\n")
+    # Guardar producto agregado
+    productos_agregados.append((producto_seleccionado, precio_total))
+    actualizar_lista()
+
+def actualizar_lista():
+    lista_productos.delete(0, END)
+    for producto, precio in productos_agregados:
+        lista_productos.insert(END, f"{producto}: ${precio:.2f}")
 
 # Configuración de la interfaz gráfica
 raiz = Tk()
 raiz.title("Caja Registradora")
-raiz.geometry("400x400")
+raiz.geometry("500x500")
 raiz.configure(background="#aba6a4")
 
 Label(raiz, text="Introduce el día de la semana", font=("Arial", 14)).grid(column=0, row=0, padx=10, pady=10)
@@ -175,10 +183,10 @@ Label(raiz, text="Introduce la cantidad (kg/unidades)", font=("Arial", 14)).grid
 cantidad = StringVar(raiz)
 Entry(raiz, textvariable=cantidad).grid(column=1, row=3, padx=10, pady=10)
 
-Button(raiz, text="Calcular Precio", command=calcular_precio).grid(column=0, row=4, columnspan=2, pady=10)
+Button(raiz, text="Agregar Producto", command=agregar_producto).grid(column=0, row=4, columnspan=2, pady=10)
 
-Label(raiz, text="Resultados", font=("Arial", 14)).grid(column=0, row=5, padx=10, pady=10)
-resultado = Listbox(raiz, height=8, width=40)
-resultado.grid(column=0, row=6, columnspan=2, padx=10, pady=10)
+Label(raiz, text="Productos Agregados", font=("Arial", 14)).grid(column=0, row=5, padx=10, pady=10)
+lista_productos = Listbox(raiz, width=50, height=10)
+lista_productos.grid(column=0, row=6, columnspan=2, padx=10, pady=10)
 
 raiz.mainloop()
